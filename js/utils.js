@@ -121,13 +121,14 @@ function mergeDupes(data) {
 	// The future merged list of campaigns
 	const uniqueCampaigns = {};
 
+	// For each campaign:
 	data.forEach(row => {
 
 		// If `uniqueCampaigns` doesn't include the current campaign, add it:
 		if (!uniqueCampaigns.hasOwnProperty(row.campaign)) {
 			uniqueCampaigns[row.campaign] = row;
 
-		// Else merge the two
+		// Else merge the two:
 		}  else {
 
 			// Save the action from the previous and current days
