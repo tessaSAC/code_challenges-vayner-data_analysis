@@ -1,6 +1,6 @@
 const fs = require('fs');
 const neatCsv = require('neat-csv');
-const { uniqsPerMonth } = require('./utils');
+const { uniqsPerMonth, totalConvertsPerInitiative } = require('./utils');
 
 let numsUnique,
 	numPlantConversions,
@@ -14,11 +14,16 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 	// Returns a promise for an array with the parsed CSV.
 	neatCsv(data).then(data => {
 		// Returns number of unique campaigns
+			// Function signature: csv file, desired month
 	    numsUnique = uniqsPerMonth(data, '02').size;
+
+	    // Returns number of conversions in an initiative
+	    	// Function signature: csv file, initiative's name, array of desired action types
 	    numPlantConversions = totalConvertsPerInitiative(data, 'plants', ['x', 'y']);
 	})
 	.then(() => {
-		console.log(numsUnique); // TODO: add numsUnique with action types `x` and `y`
+		// console.log(numsUnique); // TODO: add numsUnique with action types `x` and `y`
+		// console.log(numPlantConversions)
 	})
 	.catch(err);
 });
@@ -56,50 +61,6 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 // What was the total cost per video view?
 
 // CAMPAIGN: initiative_audience_asset
-
-
-// 2. total conversions PLANTS initiative
-	// Add all conversions of type x || y that contains PLANTS initiative
-		// console.log(/"x":| "y":/.test(JSON.stringify(example.actions)))
-function totalConvertsPerInitiative(data, initiative, actionTypes) {
-
-	const campaigns = new Map();
-	let actionTypesString = ''
-
-	// Add all desired action types to a string:
-	actionTypes.forEach(singleType => {
-		if (actionTypesString) {
-			actionTypesString += ` | `;
-		}
-		actionTypesString += `\\\\"${ singleType }\\\\"\:`;
-	});
-
-	// Create a regular expression of the types:
-	const actionTypesRegExp = new RegExp(actionTypesString);
-
-
-	// For each campaign:
-	data.forEach(row => {
-		// console.log(actionTypesRegExp)
-		// console.log(JSON.stringify(row.actions))
-		// console.log(actionTypesRegExp.test(JSON.stringify(row.actions)))
-		// If row matches the date
-		if (actionTypesRegExp.test(JSON.stringify(row.actions))) {
-			console.log(row.campaign)
-			// // If campaign doesn't exist add campaign
-			// if (!campaigns.has(row.campaign)) {
-			// 	campaigns.set(row.campaign, row);
-			// }
-
-			// // Else combine with previous campaign
-			// else {
-			// 	campaigns.set(row.campaign, Object.assign({}, campaigns[row.campaign], row));
-			// }
-		}
-	})
-
-	return campaigns;
-}
 
 
 
