@@ -2,6 +2,10 @@ const fs = require('fs');
 const neatCsv = require('neat-csv');
 const { uniqsPerMonth } = require('./utils');
 
+let numsUnique,
+	numPlantConversions,
+	cheapestCampaign,
+	totalCPV;
 
 // get data from csv1:
 fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
@@ -9,11 +13,11 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 
 	// Returns a promise for an array with the parsed CSV.
 	neatCsv(data).then(data => {
-	    return uniqsPerMonth('02', data);
+		// Returns number of unique campaigns
+	    numsUnique = uniqsPerMonth('02', data).size;
 	})
-	// Returns number of unique campaigns
-	.then(numsUnique => {
-		console.log(numsUnique.size);
+	.then(() => {
+		console.log(numsUnique);
 	})
 	.catch(err);
 });
@@ -45,7 +49,7 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 // ]
 
 // Questions:
-// How many unique campaigns ran in February?
+// How many unique campaigns ran in February? ✅
 // What is the total number of conversions on plants?
 // What audience, asset combination had the least expensive conversions?
 // What was the total cost per video view?

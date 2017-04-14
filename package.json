@@ -1,7 +1,9 @@
 {
-	"start": "js/index.js",
 	"dependencies": {
 		"csv": "^1.1.1",
 		"neat-csv": "^2.1.0"
+	},
+	"scripts": {
+		"start": "node js/index.js"
 	}
 }
