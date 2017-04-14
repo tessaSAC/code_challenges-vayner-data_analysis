@@ -28,7 +28,7 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, csv1) {
 			.then(() => {
 				// Returns number of unique campaigns
 					// Function signature: csv file, desired month
-			    numsUnique = uniqsPerMonth(data, '02').size;
+			    numsUnique = uniqsPerMonth(data, '02');
 
 			    // Returns number of conversions in an initiative
 			    	// Function signature: csv file, initiative's name, array of desired action types
@@ -43,10 +43,12 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, csv1) {
 			    totalCPV =  findTotalCPV(data, ['x', 'y'], filterData, 'video');
 
 			    return Promise.all([numsUnique, numPlantConversions, cheapestCampaign, totalCPV]);
-			    // TODO: Why did `numPlantConversions` change?
+			    // TODO: Why did `numPlantConversions` change? -- still not sure after tests -- should write more later
 			})
 			.then((data) => {
-				console.log(data) // TODO: Write to file
+				console.log(data)
+				// data looks like: [ 125, 100741, [ 'cow', 'plains' ], 0.01 ]
+				
 			})
 		})
 	})

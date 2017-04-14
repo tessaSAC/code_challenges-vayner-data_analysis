@@ -11,33 +11,10 @@ module.exports = {
 // What audience, asset combination had the least expensive conversions? ✅
 // What was the total cost per video view? ✅
 
-// SAMPLE OUTPUT:
-// [
-// 	Row {
-// 	    campaign: 'fish_cow_desert',
-// 	    date: '2015-01-01',
-// 	    spend: '10.98',
-// 	    impressions: '1621',
-// 	    actions: '[
-// 	    	{
-// 	    		"action": "conversions",
-// 	    		"y": 47,
-// 	    	}, {
-// 	    		"action": "conversions",
-// 	    		"b": 49
-// 	    	}, {
-// 	    		"action": "views",
-// 	    		"x": 29
-// 	    	}, {
-// 	    		"action": "views",
-// 	    		"a": 29
-// 	    	}
-// 	    ]'
-// 	}
-// ]
 
-
-// 1. unique campaigns in Feb -- csv1 parse date
+// 1. unique campaigns in Feb
+	// Take the data from csv1 and parse for unique campaigns with month '02'
+	// Does this include any that don't have action types `x` || `y`?
 function uniqsPerMonth(data, month) {
 
 	const monthRegExp = new RegExp(`\\d{4}-${month}-\\d{2}`);
@@ -51,13 +28,6 @@ function uniqsPerMonth(data, month) {
 			if (!campaigns.has(row.campaign)) {
 				campaigns.set(row.campaign, row);
 			}
-
-			// Note: this step is unnecessary because we only need # of unique campaigns
-				// Maybe I can add the TODO util reduce function in case we later want the unique campaigns
-			// Else combine with previous campaign
-			else {
-				campaigns.set(row.campaign, Object.assign({}, campaigns[row.campaign], row));
-			}
 		}
 	})
 
@@ -66,7 +36,6 @@ function uniqsPerMonth(data, month) {
 
 // 2. total conversions PLANTS initiative
 	// Add all conversions of type x || y that contains PLANTS initiative
-		// console.log(/"x":| "y":/.test(JSON.stringify(example.actions)))
 function totalConvertsPerInitiative(data, initiative, actionTypes) {
 
 	let numConversions = 0;
@@ -94,12 +63,10 @@ function totalConvertsPerInitiative(data, initiative, actionTypes) {
 	});
 }
 
+
 // 3. audience + asset's lowest CPM
-	// conversions / CPM -- CPM: spend/(conversions * 1000)
-	// even if math is wrong proportionally this should be ok
-	// is it per campaigns ever??
-		// TODO: Create helper function to reduce multi-day campaigns
-			// Note to self: `Object.assign` won't merge values
+	// conversions / CPM -- CPM: spend/(conversions * 1000) -- OOP?
+		// even if math is wrong proportionally this should be ok
 function findLowestCPM(data, actionTypes) {
 	let currentMinCPM = Infinity;
 	let campaignDetails = '';
@@ -119,9 +86,12 @@ function findLowestCPM(data, actionTypes) {
 }
 
 
-// CAMPAIGN: initiative_audience_asset
-
-// 4. Total cost per video view -- cost per view or cost per video?
+// 4. Total cost per video view
+	// Merge numerical values of multi-day campaigns
+	// Use csv2 to filter out non-video campaigns
+	// Sum total spend for each campaign with action types `x` || `y`
+	// Sum total views of types `x` || `y`
+	// Return (total spend / total views)
 function findTotalCPV(data, actionTypes, filterData, filterType) {
 	let totalCost = 0;
 	let totalViews = 0;
@@ -155,15 +125,21 @@ function findTotalCPV(data, actionTypes, filterData, filterType) {
 };
 
 
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
+
 
 
 // HELPER FUNCTIONS:
 
+
+// Rounds to the nearest penny
 function dollarRound(value, decimals) {
   return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
 
+
+// Creates a regular expression to search for keys of the required action types
 function actionTypesRegExer(actionTypes) {
 	let actionTypesString = ''
 
@@ -180,6 +156,7 @@ function actionTypesRegExer(actionTypes) {
 }
 
 
+// Finds the number of a certain action of certain types
 function findNumActions(actions, actionTypes, actionFilter) {
 	let numActions = 0;
 
@@ -197,6 +174,7 @@ function findNumActions(actions, actionTypes, actionFilter) {
 }
 
 
+// Combines numerical values of multi-day campaigns
 function mergeDupes(data) {
 
 	// The future merged list of campaigns
@@ -258,7 +236,7 @@ function mergeDupes(data) {
 }
 
 
-// csv2 example: [ Row { campaign: 'lion_meat_jungle', object_type: 'photo' } ]
+// Filter campaigns of a specific type or name
 function filterBy(data, filterData, filterType) {
 
 	// Go through filterData and save campaign names of the correct filterType
