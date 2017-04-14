@@ -10,14 +10,6 @@ core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
 
-csv-generate@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-1.0.0.tgz#bd52886859d0c925f3e51f60f3abed262fa15caf"
-
-csv-parse@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-1.2.0.tgz#047b73868ab9a85746e885f637f9ed0fb645a425"
-
 csv-parser@^1.6.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/csv-parser/-/csv-parser-1.11.0.tgz#cd92c3f49895a3c1591591035cbfbe6b51c55ab1"
@@ -27,21 +19,6 @@ csv-parser@^1.6.0:
     inherits "^2.0.1"
     minimist "^1.2.0"
     ndjson "^1.4.0"
-
-csv-stringify@^1.0.0:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-1.0.4.tgz#bc18bab9ad4cef3195fd257980b58b479c42d3e5"
-  dependencies:
-    lodash.get "^4.0.0"
-
-csv@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/csv/-/csv-1.1.1.tgz#d9952d59b1f964a7afbcdd804d6818a73199a477"
-  dependencies:
-    csv-generate "^1.0.0"
-    csv-parse "^1.2.0"
-    csv-stringify "^1.0.0"
-    stream-transform "^0.1.0"
 
 from2@^2.1.1:
   version "2.3.0"
@@ -88,10 +65,6 @@ isarray@~1.0.0:
 json-stringify-safe@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
-
-lodash.get@^4.0.0:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
 
 minimist@^1.2.0:
   version "1.2.0"
@@ -149,10 +122,6 @@ split2@^2.1.0:
   resolved "https://registry.yarnpkg.com/split2/-/split2-2.1.1.tgz#7a1f551e176a90ecd3345f7246a0cfe175ef4fd0"
   dependencies:
     through2 "^2.0.2"
-
-stream-transform@^0.1.0:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/stream-transform/-/stream-transform-0.1.2.tgz#7d8e6b4e03ac4781778f8c79517501bfb0762a9f"
 
 string_decoder@~1.0.0:
   version "1.0.0"

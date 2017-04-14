@@ -4,14 +4,9 @@ module.exports = {
 
 
 // 1. unique campaigns in Feb -- csv1 parse date
-function uniqsPerMonth(month, data) {
-	// month = month separated
-	// const month = date.split('-')[1]; -- change `date` to `month`
+function uniqsPerMonth(data, month) {
+
 	const monthRegExp = new RegExp(`\\d{4}-${month}-\\d{2}`);
-
-	// trim any leading zeros -- nvm; will just create more work in comparison stage
-	// month = month.replace(/^0+/g, '');
-
 	const campaigns = new Map();
 
 	// For each campaign:

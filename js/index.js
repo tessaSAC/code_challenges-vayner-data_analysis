@@ -14,10 +14,11 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 	// Returns a promise for an array with the parsed CSV.
 	neatCsv(data).then(data => {
 		// Returns number of unique campaigns
-	    numsUnique = uniqsPerMonth('02', data).size;
+	    numsUnique = uniqsPerMonth(data, '02').size;
+	    numPlantConversions = totalConvertsPerInitiative(data, 'plants', ['x', 'y']);
 	})
 	.then(() => {
-		console.log(numsUnique);
+		console.log(numsUnique); // TODO: add numsUnique with action types `x` and `y`
 	})
 	.catch(err);
 });
@@ -32,7 +33,7 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 // 	    impressions: '1621',
 // 	    actions: '[
 // 	    	{
-// 	    		"action": "conversions"
+// 	    		"action": "conversions",
 // 	    		"y": 47,
 // 	    	}, {
 // 	    		"action": "conversions",
@@ -57,8 +58,52 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 // CAMPAIGN: initiative_audience_asset
 
 
-// 2. total conversions PLANT initiative
+// 2. total conversions PLANTS initiative
 	// Add all conversions of type x || y that contains PLANTS initiative
+		// console.log(/"x":| "y":/.test(JSON.stringify(example.actions)))
+function totalConvertsPerInitiative(data, initiative, actionTypes) {
+
+	const campaigns = new Map();
+	let actionTypesString = ''
+
+	// Add all desired action types to a string:
+	actionTypes.forEach(singleType => {
+		if (actionTypesString) {
+			actionTypesString += ` | `;
+		}
+		actionTypesString += `\\\\"${ singleType }\\\\"\:`;
+	});
+
+	// Create a regular expression of the types:
+	const actionTypesRegExp = new RegExp(actionTypesString);
+
+
+	// For each campaign:
+	data.forEach(row => {
+		// console.log(actionTypesRegExp)
+		// console.log(JSON.stringify(row.actions))
+		// console.log(actionTypesRegExp.test(JSON.stringify(row.actions)))
+		// If row matches the date
+		if (actionTypesRegExp.test(JSON.stringify(row.actions))) {
+			console.log(row.campaign)
+			// // If campaign doesn't exist add campaign
+			// if (!campaigns.has(row.campaign)) {
+			// 	campaigns.set(row.campaign, row);
+			// }
+
+			// // Else combine with previous campaign
+			// else {
+			// 	campaigns.set(row.campaign, Object.assign({}, campaigns[row.campaign], row));
+			// }
+		}
+	})
+
+	return campaigns;
+}
+
+
+
+
 // 3. audience + asset's lowest CPM
 	// conversions / CPM -- CPM: spend/(conversions * 1000)
 	// even if math is wrong proportionally this should be ok
