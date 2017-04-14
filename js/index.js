@@ -1,13 +1,18 @@
+// NPM Packages
 const fs = require('fs');
 const neatCsv = require('neat-csv');
+
+// Util functions
 const { uniqsPerMonth, totalConvertsPerInitiative, findLowestCPM, findTotalCPV } = require('./utils');
 
+// Variables
 let data,
 	filterData,
 	numsUnique,
 	numPlantConversions,
 	cheapestCampaign,
 	totalCPV;
+
 
 // get data from csv1:
 fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, csv1) {
@@ -45,11 +50,27 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, csv1) {
 			    return Promise.all([numsUnique, numPlantConversions, cheapestCampaign, totalCPV]);
 			    // TODO: Why did `numPlantConversions` change? -- still not sure after tests -- should write more later
 			})
-			.then((data) => {
-				console.log(data)
+			.then(data => {
+				let dataString = '';
+
 				// data looks like: [ 125, 100741, [ 'cow', 'plains' ], 0.01 ]
-				
+				dataString += `Number of Unique Campaigns in February: ${ data[0] }\n`;
+				dataString += `Total number of conversions on plants: ${ data[1] }\n`;
+				dataString += `Cheapest audience-asset combo: ${ data[2].join(', ') }\n`;
+				dataString += `Total cost-per-video-views: $${ data[3] }\n`;
+
+				console.log(dataString)
+
+				// Write data to output file
+				fs.writeFile('output.txt', dataString, function(err) {
+				    if(err) {
+				        return console.error(err);
+				    }
+
+				    console.log('The data\'s been written to the file.');
+				});
 			})
+			.catch(console.error);
 		})
 	})
 });

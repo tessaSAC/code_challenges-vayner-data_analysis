@@ -15,6 +15,7 @@ module.exports = {
 // 1. unique campaigns in Feb
 	// Take the data from csv1 and parse for unique campaigns with month '02'
 	// Does this include any that don't have action types `x` || `y`?
+		// Assumed no, but can easily be found using `actionTypesRegExer` helper function
 function uniqsPerMonth(data, month) {
 
 	const monthRegExp = new RegExp(`\\d{4}-${month}-\\d{2}`);

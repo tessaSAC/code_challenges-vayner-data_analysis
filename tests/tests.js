@@ -1,6 +1,15 @@
+// NPM Packages
 const chai = require('chai');
 const expect = chai.expect;
+
+// Util functions being tested
 const { uniqsPerMonth, totalConvertsPerInitiative, findLowestCPM, findTotalCPV } = require('../js/utils');
+
+
+
+
+// +++ MOCKS +++  MOCKS +++  MOCKS +++  MOCKS +++  MOCKS +++  MOCKS +++  MOCKS +++  MOCKS +++ //
+
 
 const csv1 = JSON.parse(JSON.stringify([ { "campaign"    : "fish_cow_desert",
     "date"        : "2015-05-01",
@@ -30,8 +39,8 @@ const csv2 = JSON.parse(JSON.stringify([ { "campaign"    : "cow_moon_plants",
 
 
 
-// +++ TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++ //
 
+// +++ TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++  TESTS +++ //
 
 
 describe('Utils function tests', function () {
