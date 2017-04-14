@@ -119,20 +119,20 @@ function findNumConversions(actions, actionTypes) {
 function mergeDupes(data) {
 
 	// The future merged list of campaigns
-	const uniqueCampaigns = new Map();
+	const uniqueCampaigns = {};
 
 	data.forEach(row => {
 
 		// If `uniqueCampaigns` doesn't include the current campaign, add it:
-		if (!uniqueCampaigns.has(row.campaign)) {
-			uniqueCampaigns.set(row.campaign, row);
+		if (!uniqueCampaigns.hasOwnProperty(row.campaign)) {
+			uniqueCampaigns[row.campaign] = row;
 
 		// Else merge the two
 		}  else {
 
 			// Save the action from the previous and current days
 			const newRow = JSON.parse(row.actions);
-			const oldRow = JSON.parse(uniqueCampaigns.get(row.campaign).actions);
+			const oldRow = (JSON.parse(uniqueCampaigns[row.campaign]["actions"]));
 
 			// Locate where they are in their respective campaign rows
 			const newRowActionIndices = newRow.map(actionObj => JSON.stringify(Object.keys(actionObj).sort()) + `, ${ actionObj.action }`);
@@ -159,11 +159,13 @@ function mergeDupes(data) {
 				// Else add the new action
 				} else {
 					mergedActions.push(newRow[idx]);
-					console.log(newRow[idx])
 				}
-			})
+			});
+
+			// Add STRINGIFIED (bc JSON) merged actions to `uniqueCampaigns`
+			uniqueCampaigns[row.campaign].actions = JSON.stringify(mergedActions);
 		}
-	})
+	});
 
 	return uniqueCampaigns;
 }
