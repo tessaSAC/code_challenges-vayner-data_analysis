@@ -1,6 +1,7 @@
 module.exports = {
 	uniqsPerMonth,
-	totalConvertsPerInitiative
+	totalConvertsPerInitiative,
+	findLowestCPM
 };
 
 
@@ -49,25 +50,62 @@ function totalConvertsPerInitiative(data, initiative, actionTypes) {
 	const actionTypesRegExp = new RegExp(actionTypesString);
 
 	// For each campaign:
-	data.forEach(row => {
+	return Promise.resolve(data.forEach(row => {
 		// If campagn has the desired initiative:
 		if (row.campaign.slice(0, row.campaign.indexOf('_')) === initiative) {
 
 			// If campaign contains the required actions
 			if (actionTypesRegExp.test(JSON.stringify(row.actions))) {
-
-				// For each action object,
-				JSON.parse(row.actions).forEach(action => {
-
-					// For each `conversions` action with the required type add to `numConversions`
-					actionTypes.forEach(singleType => {
-						if (action.action === 'conversions') {
-							numConversions += action[singleType] || 0;
-						}
-					});
-				});
+				findNumConversions(row.actions, actionTypes)
+				.then(addlConversions => {
+					numConversions += addlConversions || 0
+				})
+				.catch;
 			};
 		};
+	}))
+	.then(() => {
+		return numConversions;
 	});
-	return numConversions;
+}
+
+// 3. audience + asset's lowest CPM
+	// conversions / CPM -- CPM: spend/(conversions * 1000)
+	// even if math is wrong proportionally this should be ok
+function findLowestCPM(data, actionTypes) {
+	let currentMinCPM = Infinity;
+	let campaignDetails = '';
+
+	return Promise.resolve(data.forEach(row => {
+		findNumConversions(row.actions, actionTypes)
+		.then(numConversions => {
+			const currentCampaignCPM = row.spend / numConversions * 1000;
+
+			if (currentCampaignCPM < currentMinCPM) {
+				currentMinCPM = currentCampaignCPM;
+				campaignDetails = row.campaign;
+			};
+		})
+	}))
+	.then(() => campaignDetails.split('_').slice(1));
+}
+
+
+// HELPER FUNCTIONS:
+
+function findNumConversions(actions, actionTypes) {
+
+	let numConversions = 0;
+
+	// For each action object,
+	JSON.parse(actions).forEach(action => {
+		// For each `conversions` action with the required type add to `numConversions`
+		actionTypes.forEach(singleType => {
+			if (action.action === 'conversions') {
+				numConversions += action[singleType] || 0;
+			}
+		});
+	});
+
+	return Promise.resolve(numConversions);
 }
