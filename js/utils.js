@@ -20,6 +20,8 @@ function uniqsPerMonth(data, month) {
 				campaigns.set(row.campaign, row);
 			}
 
+			// Note: this step is unnecessary because we only need # of unique campaigns
+				// Maybe I can add the TODO util reduce function in case we later want the unique campaigns
 			// Else combine with previous campaign
 			else {
 				campaigns.set(row.campaign, Object.assign({}, campaigns[row.campaign], row));
@@ -72,6 +74,9 @@ function totalConvertsPerInitiative(data, initiative, actionTypes) {
 // 3. audience + asset's lowest CPM
 	// conversions / CPM -- CPM: spend/(conversions * 1000)
 	// even if math is wrong proportionally this should be ok
+	// is it per campaigns ever??
+		// TODO: Create helper function to reduce multi-day campaigns
+			// Note to self: `Object.assign` won't merge values
 function findLowestCPM(data, actionTypes) {
 	let currentMinCPM = Infinity;
 	let campaignDetails = '';
