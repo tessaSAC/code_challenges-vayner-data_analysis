@@ -117,53 +117,46 @@ function findNumConversions(actions, actionTypes) {
 
 
 function mergeDupes(data) {
-	let uniqueCampaigns = new Map();
 
-// const one = Map({ a: Map({ x: 10, y: 10 }), b: Map({ x: 20, y: 50 }) })
-// const two = Map({ a: Map({ x: 2 }), b: Map({ y: 5 }), c: Map({ z: 3 }) })
-// one.mergeDeepWith((oldVal, newVal) => oldVal + newVal)
+	// The future merged list of campaigns
+	const uniqueCampaigns = new Map();
 
 	data.forEach(row => {
+
+		// If `uniqueCampaigns` doesn't include the current campaign, add it:
 		if (!uniqueCampaigns.has(row.campaign)) {
 			uniqueCampaigns.set(row.campaign, row);
+
+		// Else merge the two
 		}  else {
-			// actions: '[
-// 	    	{
-// 	    		"action": "conversions",
-// 	    		"y": 47,
-// 	    	}, {
-// 	    		"action": "conversions",
-// 	    		"b": 49
-// 	    	}, {
-// 	    		"action": "views",
-// 	    		"x": 29
-// 	    	}, {
-// 	    		"action": "views",
-// 	    		"a": 29
-// 	    	}
-// 	    ]'
-			// console.log(typeof row)
+
+			// Save the action from the previous and current days
 			const newRow = JSON.parse(row.actions);
 			const oldRow = JSON.parse(uniqueCampaigns.get(row.campaign).actions);
+
+			// Locate where they are in their respective campaign rows
 			const newRowActionIndices = newRow.map(actionObj => JSON.stringify(Object.keys(actionObj).sort()) + `, ${ actionObj.action }`);
 			const oldRowActionIndices = oldRow.map(actionObj => JSON.stringify(Object.keys(actionObj).sort()) + `, ${ actionObj.action }`);
+
+			// Copy the previous day's action
 			const mergedActions = oldRow;
 
+			// Merge the previous and current day's actions:
 			newRowActionIndices.forEach((actionString, idx) => {
 				// Save index of matching action in the oldRow if it exists
 				const oldRowIdx = oldRowActionIndices.indexOf(actionString);
 
 				// If the action already exists
 				if (oldRowIdx >= 0) {
-					// Get key name that isn't the action type:
+					// Get the action type's name:
 					const keyNames = Object.keys(oldRow[oldRowIdx]);
 					// Since there should be only two keys it'll be one or the other
 					const dynamicKeyName = keyNames[keyNames.indexOf("action") === 0 ? 1 : 0];
-					console.log("OLD", oldRow[oldRowIdx], "NEW", newRow[idx])
-					// Combine the old and new by
-					mergedActions[oldRowIdx][dynamicKeyName] = +mergedActions[oldRowIdx][dynamicKeyName] + newRow[idx][dynamicKeyName];
-					console.log("MERGED", mergedActions[oldRowIdx])
 
+					// Combine the old and new action types' counts
+					mergedActions[oldRowIdx][dynamicKeyName] = +mergedActions[oldRowIdx][dynamicKeyName] + newRow[idx][dynamicKeyName];
+
+				// Else add the new action
 				} else {
 					mergedActions.push(newRow[idx]);
 					console.log(newRow[idx])
@@ -171,4 +164,6 @@ function mergeDupes(data) {
 			})
 		}
 	})
+
+	return uniqueCampaigns;
 }
