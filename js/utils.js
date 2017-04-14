@@ -2,7 +2,7 @@ module.exports = {
 	uniqsPerMonth,
 	totalConvertsPerInitiative,
 	findLowestCPM,
-	findTotalCPV
+	findTotalCPV,
 };
 
 // QUESTIONS:
@@ -61,7 +61,7 @@ function uniqsPerMonth(data, month) {
 		}
 	})
 
-	return campaigns;
+	return campaigns.size;
 }
 
 // 2. total conversions PLANTS initiative
@@ -130,7 +130,7 @@ function findTotalCPV(data, actionTypes, filterData, filterType) {
 	const mergedData = mergeDupes(data);
 
 	// Filter out campaigns WITHOUT type VIDEO using csv2
-	const videoCampaigns = filterBy(mergedData, filterData, "video");
+	const videoCampaigns = filterBy(mergedData, filterData, 'video');
 
 	// For each campaign:
 	return Promise.resolve(videoCampaigns.forEach(row => {
@@ -257,19 +257,20 @@ function mergeDupes(data) {
 	return uniqueCampaignsArray;
 }
 
+
 // csv2 example: [ Row { campaign: 'lion_meat_jungle', object_type: 'photo' } ]
 function filterBy(data, filterData, filterType) {
 
 	// Go through filterData and save campaign names of the correct filterType
 	const filter = [];
 	filterData.forEach(row =>  {
-	 	if (row["object_type"] === filterType) filter.push(row.campaign);
+	 	if (row['object_type'] === filterType) filter.push(row.campaign.split('_').sort().join(',')); // Campaign may not be sorted
 	});
 
 	// Use `filter` to create a new array of campaigns that are of the correct type
 	const postFilterData = [];
 	data.forEach(row => {
-		if (filter.indexOf(row.campaign) >=0) postFilterData.push(row);
+		if (filter.indexOf(row.campaign.split('_').sort().join(',')) >=0) postFilterData.push(row);
 	})
 
 	// return the filtered data
