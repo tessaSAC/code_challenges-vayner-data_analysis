@@ -1,6 +1,6 @@
 const fs = require('fs');
 const neatCsv = require('neat-csv');
-const { uniqsPerMonth, totalConvertsPerInitiative, findLowestCPM, mergeDupes } = require('./utils');
+const { uniqsPerMonth, totalConvertsPerInitiative, findLowestCPM, findTotalCPV } = require('./utils');
 
 let numsUnique,
 	numPlantConversions,
@@ -27,8 +27,8 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 
 	    fs.readFile(`${ __dirname }/../files/source2.csv`, function (err, data2) {
 	    	neatCsv(data2).then(data2 => {
-	    		filterBy(data, data2, "video")
-	    	});
+	    		return findTotalCPV(data, ['x', 'y'], data2, 'video');
+	    	}).then(console.log);
 	    })
 	})
 	.then((data) => {
@@ -70,10 +70,3 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 // What is the total number of conversions on plants?
 // What audience, asset combination had the least expensive conversions?
 // What was the total cost per video view?
-
-// CAMPAIGN: initiative_audience_asset
-
-// 4. Total cost per video view -- cost per view or cost per video?
-	// Filter out campaigns WITHOUT type VIDEO using csv2
-		// Since campaign is in random order use `has` or `contains`
-	// For each campaign reduce: spend / (total views of type x || y)

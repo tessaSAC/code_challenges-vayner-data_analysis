@@ -2,7 +2,7 @@ module.exports = {
 	uniqsPerMonth,
 	totalConvertsPerInitiative,
 	findLowestCPM,
-	mergeDupes
+	findTotalCPV
 };
 
 
@@ -39,18 +39,9 @@ function uniqsPerMonth(data, month) {
 function totalConvertsPerInitiative(data, initiative, actionTypes) {
 
 	let numConversions = 0;
-	let actionTypesString = ''
-
-	// Add all desired action types to a string:
-	actionTypes.forEach(singleType => {
-		if (actionTypesString) {
-			actionTypesString += ` | `;
-		}
-		actionTypesString += `\\\\"${ singleType }\\\\"\:`;
-	});
 
 	// Create a regular expression of the types:
-	const actionTypesRegExp = new RegExp(actionTypesString);
+	const actionTypesRegExp = actionTypesRegExer(actionTypes);
 
 	// For each campaign:
 	return Promise.resolve(data.forEach(row => {
@@ -59,7 +50,7 @@ function totalConvertsPerInitiative(data, initiative, actionTypes) {
 
 			// If campaign contains the required actions
 			if (actionTypesRegExp.test(JSON.stringify(row.actions))) {
-				findNumConversions(row.actions, actionTypes)
+				findNumActions(row.actions, actionTypes, 'conversions')
 				.then(addlConversions => {
 					numConversions += addlConversions || 0
 				})
@@ -97,22 +88,81 @@ function findLowestCPM(data, actionTypes) {
 }
 
 
+// CAMPAIGN: initiative_audience_asset
+
+// 4. Total cost per video view -- cost per view or cost per video?
+function findTotalCPV(data, actionTypes, filterData, filterType) {
+	let totalCost = 0;
+	let totalViews = 0;
+
+	// Merge campaigns across all days
+	const mergedData = mergeDupes(data);
+
+	// Filter out campaigns WITHOUT type VIDEO using csv2
+	const videoCampaigns = filterBy(mergedData, filterData, "video");
+
+	// For each campaign:
+	return Promise.resolve(videoCampaigns.forEach(row => {
+		// Create a regular expression of the types:
+		const actionTypesRegExp = actionTypesRegExer(actionTypes);
+
+		// If campaign contains the required actions
+		if (actionTypesRegExp.test(JSON.stringify(row.actions))) {
+			// For each action of the required type add to `totalCost` and `totalViews`
+			findNumActions(row.actions, actionTypes, 'views')
+			.then(numViews => {
+				totalCost += +row.spend;
+				totalViews += numViews || 0;
+			})
+			.catch;
+		};
+	}))
+	.then(() => {
+		// Return CPV rounded to nearest penny:
+		return dollarRound((totalCost / totalViews), 2);
+	});
+};
+
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
+
+
 // HELPER FUNCTIONS:
 
-function findNumConversions(actions, actionTypes) {
-	let numConversions = 0;
+function dollarRound(value, decimals) {
+  return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+function actionTypesRegExer(actionTypes) {
+	let actionTypesString = ''
+
+	// Add all desired action types to a string:
+	actionTypes.forEach(singleType => {
+		if (actionTypesString) {
+			actionTypesString += `|`; // IMPORTANT: DO *NOT* ADD SPACES HERE!!!!!!
+		}
+		actionTypesString += `\\\\"${ singleType }\\\\":`;
+
+	});
+
+	return new RegExp(actionTypesString);
+}
+
+
+function findNumActions(actions, actionTypes, actionFilter) {
+	let numActions = 0;
 
 	// For each action object,
 	JSON.parse(actions).forEach(action => {
-		// For each `conversions` action with the required type add to `numConversions`
+		// For each action that matches the `actionFilter` add to `numActions`
 		actionTypes.forEach(singleType => {
-			if (action.action === 'conversions') {
-				numConversions += action[singleType] || 0;
+			if (action.action === actionFilter) {
+				numActions += action[singleType] || 0;
 			}
 		});
 	});
 
-	return Promise.resolve(numConversions);
+	return Promise.resolve(numActions);
 }
 
 
@@ -168,14 +218,16 @@ function mergeDupes(data) {
 		}
 	});
 
-	return uniqueCampaigns;
+	// Array conversion hack
+	const uniqueCampaignsArray = [];
+	for (let key in uniqueCampaigns) {
+		uniqueCampaignsArray.push(uniqueCampaigns[key]);
+	}
+	return uniqueCampaignsArray;
 }
 
 // csv2 example: [ Row { campaign: 'lion_meat_jungle', object_type: 'photo' } ]
 function filterBy(data, filterData, filterType) {
-
-	// Merge dataset
-	const conglomerateData = mergeDupes(data);
 
 	// Go through filterData and save campaign names of the correct filterType
 	const filter = [];
