@@ -5,6 +5,37 @@ module.exports = {
 	findTotalCPV
 };
 
+// QUESTIONS:
+// How many unique campaigns ran in February? ✅
+// What is the total number of conversions on plants? ✅
+// What audience, asset combination had the least expensive conversions? ✅
+// What was the total cost per video view? ✅
+
+// SAMPLE OUTPUT:
+// [
+// 	Row {
+// 	    campaign: 'fish_cow_desert',
+// 	    date: '2015-01-01',
+// 	    spend: '10.98',
+// 	    impressions: '1621',
+// 	    actions: '[
+// 	    	{
+// 	    		"action": "conversions",
+// 	    		"y": 47,
+// 	    	}, {
+// 	    		"action": "conversions",
+// 	    		"b": 49
+// 	    	}, {
+// 	    		"action": "views",
+// 	    		"x": 29
+// 	    	}, {
+// 	    		"action": "views",
+// 	    		"a": 29
+// 	    	}
+// 	    ]'
+// 	}
+// ]
+
 
 // 1. unique campaigns in Feb -- csv1 parse date
 function uniqsPerMonth(data, month) {
@@ -74,7 +105,7 @@ function findLowestCPM(data, actionTypes) {
 	let campaignDetails = '';
 
 	return Promise.resolve(data.forEach(row => {
-		findNumConversions(row.actions, actionTypes)
+		findNumActions(row.actions, actionTypes, 'conversions')
 		.then(numConversions => {
 			const currentCampaignCPM = row.spend / numConversions * 1000;
 
