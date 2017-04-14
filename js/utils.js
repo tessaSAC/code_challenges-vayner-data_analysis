@@ -1,7 +1,8 @@
 module.exports = {
 	uniqsPerMonth,
 	totalConvertsPerInitiative,
-	findLowestCPM
+	findLowestCPM,
+	mergeDupes
 };
 
 
@@ -99,7 +100,6 @@ function findLowestCPM(data, actionTypes) {
 // HELPER FUNCTIONS:
 
 function findNumConversions(actions, actionTypes) {
-
 	let numConversions = 0;
 
 	// For each action object,
@@ -113,4 +113,62 @@ function findNumConversions(actions, actionTypes) {
 	});
 
 	return Promise.resolve(numConversions);
+}
+
+
+function mergeDupes(data) {
+	let uniqueCampaigns = new Map();
+
+// const one = Map({ a: Map({ x: 10, y: 10 }), b: Map({ x: 20, y: 50 }) })
+// const two = Map({ a: Map({ x: 2 }), b: Map({ y: 5 }), c: Map({ z: 3 }) })
+// one.mergeDeepWith((oldVal, newVal) => oldVal + newVal)
+
+	data.forEach(row => {
+		if (!uniqueCampaigns.has(row.campaign)) {
+			uniqueCampaigns.set(row.campaign, row);
+		}  else {
+			// actions: '[
+// 	    	{
+// 	    		"action": "conversions",
+// 	    		"y": 47,
+// 	    	}, {
+// 	    		"action": "conversions",
+// 	    		"b": 49
+// 	    	}, {
+// 	    		"action": "views",
+// 	    		"x": 29
+// 	    	}, {
+// 	    		"action": "views",
+// 	    		"a": 29
+// 	    	}
+// 	    ]'
+			// console.log(typeof row)
+			const newRow = JSON.parse(row.actions);
+			const oldRow = JSON.parse(uniqueCampaigns.get(row.campaign).actions);
+			const newRowActionIndices = newRow.map(actionObj => JSON.stringify(Object.keys(actionObj).sort()) + `, ${ actionObj.action }`);
+			const oldRowActionIndices = oldRow.map(actionObj => JSON.stringify(Object.keys(actionObj).sort()) + `, ${ actionObj.action }`);
+			const mergedActions = oldRow;
+
+			newRowActionIndices.forEach((actionString, idx) => {
+				// Save index of matching action in the oldRow if it exists
+				const oldRowIdx = oldRowActionIndices.indexOf(actionString);
+
+				// If the action already exists
+				if (oldRowIdx >= 0) {
+					// Get key name that isn't the action type:
+					const keyNames = Object.keys(oldRow[oldRowIdx]);
+					// Since there should be only two keys it'll be one or the other
+					const dynamicKeyName = keyNames[keyNames.indexOf("action") === 0 ? 1 : 0];
+					console.log("OLD", oldRow[oldRowIdx], "NEW", newRow[idx])
+					// Combine the old and new by
+					mergedActions[oldRowIdx][dynamicKeyName] = +mergedActions[oldRowIdx][dynamicKeyName] + newRow[idx][dynamicKeyName];
+					console.log("MERGED", mergedActions[oldRowIdx])
+
+				} else {
+					mergedActions.push(newRow[idx]);
+					console.log(newRow[idx])
+				}
+			})
+		}
+	})
 }

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const neatCsv = require('neat-csv');
-const { uniqsPerMonth, totalConvertsPerInitiative, findLowestCPM } = require('./utils');
+const { uniqsPerMonth, totalConvertsPerInitiative, findLowestCPM, mergeDupes } = require('./utils');
 
 let numsUnique,
 	numPlantConversions,
@@ -11,11 +11,14 @@ let numsUnique,
 fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 	if (err) console.err(`Warning: ${ err }`);
 
+	
+
 	// Returns a promise for an array with the parsed CSV.
 	neatCsv(data).then(data => {
 		// Returns number of unique campaigns
 			// Function signature: csv file, desired month
 	    numsUnique = uniqsPerMonth(data, '02').size;
+mergeDupes(data)
 
 	    // Returns number of conversions in an initiative
 	    	// Function signature: csv file, initiative's name, array of desired action types
