@@ -11,14 +11,11 @@ let numsUnique,
 fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 	if (err) console.err(`Warning: ${ err }`);
 
-	
-
 	// Returns a promise for an array with the parsed CSV.
 	neatCsv(data).then(data => {
 		// Returns number of unique campaigns
 			// Function signature: csv file, desired month
 	    numsUnique = uniqsPerMonth(data, '02').size;
-mergeDupes(data)
 
 	    // Returns number of conversions in an initiative
 	    	// Function signature: csv file, initiative's name, array of desired action types
@@ -26,10 +23,16 @@ mergeDupes(data)
 
 	    // Returns lowest CPM
 	    	// Function signature: data, array of desired action types
-	    return findLowestCPM(data, ['x', 'y']);
+	    // return findLowestCPM(data, ['x', 'y']);
+
+	    fs.readFile(`${ __dirname }/../files/source2.csv`, function (err, data2) {
+	    	neatCsv(data2).then(data2 => {
+	    		filterBy(data, data2, "video")
+	    	});
+	    })
 	})
 	.then((data) => {
-		console.log(data)
+		// console.log(data)
 		// console.log(numsUnique); // TODO: add numsUnique with action types `x` and `y`
 		// console.log(numPlantConversions);
 	})
@@ -69,9 +72,6 @@ mergeDupes(data)
 // What was the total cost per video view?
 
 // CAMPAIGN: initiative_audience_asset
-
-
-
 
 // 4. Total cost per video view -- cost per view or cost per video?
 	// Filter out campaigns WITHOUT type VIDEO using csv2

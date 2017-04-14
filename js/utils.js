@@ -170,3 +170,25 @@ function mergeDupes(data) {
 
 	return uniqueCampaigns;
 }
+
+// csv2 example: [ Row { campaign: 'lion_meat_jungle', object_type: 'photo' } ]
+function filterBy(data, filterData, filterType) {
+
+	// Merge dataset
+	const conglomerateData = mergeDupes(data);
+
+	// Go through filterData and save campaign names of the correct filterType
+	const filter = [];
+	filterData.forEach(row =>  {
+	 	if (row["object_type"] === filterType) filter.push(row.campaign);
+	});
+
+	// Use `filter` to create a new array of campaigns that are of the correct type
+	const postFilterData = [];
+	data.forEach(row => {
+		if (filter.indexOf(row.campaign) >=0) postFilterData.push(row);
+	})
+
+	// return the filtered data
+	return postFilterData;
+}
