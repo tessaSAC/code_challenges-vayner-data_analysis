@@ -1,5 +1,6 @@
 const fs = require('fs');
 const neatCsv = require('neat-csv');
+const { uniqsPerMonth } = require('./utils');
 
 
 // get data from csv1:
@@ -8,33 +9,40 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 
 	// Returns a promise for an array with the parsed CSV.
 	neatCsv(data).then(data => {
-	    uniqsPerMonth('02', data);
+	    return uniqsPerMonth('02', data);
+	})
+	// Returns number of unique campaigns
+	.then(numsUnique => {
+		console.log(numsUnique.size);
 	})
 	.catch(err);
 });
 
-// Sample output:
-// Row {
-//     campaign: 'fish_cow_desert',
-//     date: '2015-01-01',
-//     spend: '10.98',
-//     impressions: '1621',
-//     actions: '[
-//     	{
-//     		"action": "conversions"
-//     		"y": 47,
-//     	}, {
-//     		"action": "conversions",
-//     		"b": 49
-//     	}, {
-//     		"action": "views",
-//     		"x": 29
-//     	}, {
-//     		"action": "views",
-//     		"a": 29
-//     	}
-//     ]'
-// }
+
+// SAMPLE OUTPUT:
+// [
+// 	Row {
+// 	    campaign: 'fish_cow_desert',
+// 	    date: '2015-01-01',
+// 	    spend: '10.98',
+// 	    impressions: '1621',
+// 	    actions: '[
+// 	    	{
+// 	    		"action": "conversions"
+// 	    		"y": 47,
+// 	    	}, {
+// 	    		"action": "conversions",
+// 	    		"b": 49
+// 	    	}, {
+// 	    		"action": "views",
+// 	    		"x": 29
+// 	    	}, {
+// 	    		"action": "views",
+// 	    		"a": 29
+// 	    	}
+// 	    ]'
+// 	}
+// ]
 
 // Questions:
 // How many unique campaigns ran in February?
@@ -43,41 +51,6 @@ fs.readFile(`${ __dirname }/../files/source1.csv`, function (err, data) {
 // What was the total cost per video view?
 
 // CAMPAIGN: initiative_audience_asset
-
-// 1. unique campaigns in Feb -- csv1 parse date
-
-function uniqsPerMonth(month, data) {
-	// month = month separated
-	// const month = date.split('-')[1]; -- change `date` to `month`
-	const monthRegExp = new RegExp(`\d{4}-${month}-\d{2}`);
-
-	// trim any leading zeros -- nvm; will just create more work in comparison stage
-	// month = month.replace(/^0+/g, '');
-
-	const campaigns = new Set();
-
-	// For each campaign:
-	for (Row in data) {
-
-		// If Row matches the date
-		if (Row.date.match(month)) {
-			console.log(Row.date);
-			// // If campaign doesn't exist add campaign
-			// if (!campaigns.has(Row.campaign)) {
-			// 	campaigns.add({
-			// 		Row.campaign: Row
-			// 	});
-			// }
-
-			// // Else combine with previous campaign
-			// else {
-			// 	campaigns[Row.campaign] = Object.assign({}, campaigns[Row.campaign], Row);
-			// }
-		}
-	}
-
-	// return campaigns;
-}
 
 
 // 2. total conversions PLANT initiative
